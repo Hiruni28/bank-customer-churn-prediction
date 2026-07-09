@@ -62,10 +62,45 @@ def home():
     if "user" not in session:
         return render_template("login.html")
 
+    conn = sqlite3.connect("bank.db")
+    cursor = conn.cursor()
+
+    email = session["user"]["email"]
+
+    cursor.execute(
+        "SELECT COUNT(*) FROM predictions WHERE user_email=?",
+        (email,)
+    )
+    total = cursor.fetchone()[0]
+
+    cursor.execute(
+        "SELECT COUNT(*) FROM predictions WHERE user_email=? AND risk_level='High'",
+        (email,)
+    )
+    high = cursor.fetchone()[0]
+
+    cursor.execute(
+        "SELECT COUNT(*) FROM predictions WHERE user_email=? AND risk_level='Medium'",
+        (email,)
+    )
+    medium = cursor.fetchone()[0]
+
+    cursor.execute(
+        "SELECT COUNT(*) FROM predictions WHERE user_email=? AND risk_level='Low'",
+        (email,)
+    )
+    low = cursor.fetchone()[0]
+
+    conn.close()
+
     return render_template(
-    "dashboard.html",
-    user=session["user"]
-)
+        "dashboard.html",
+        user=session["user"],
+        total=total,
+        high=high,
+        medium=medium,
+        low=low
+    )
 
 @app.route("/prediction")
 def prediction():
@@ -111,6 +146,70 @@ def history():
         rows=rows
     )
 
+@app.route("/reports")
+def reports():
+
+    if "user" not in session:
+        return redirect(url_for("home"))
+
+    conn = sqlite3.connect("bank.db")
+    cursor = conn.cursor()
+
+    email = session["user"]["email"]
+
+    cursor.execute(
+        "SELECT COUNT(*) FROM predictions WHERE user_email=?",
+        (email,)
+    )
+    total = cursor.fetchone()[0]
+
+    cursor.execute(
+        "SELECT COUNT(*) FROM predictions WHERE user_email=? AND risk_level='High'",
+        (email,)
+    )
+    high = cursor.fetchone()[0]
+
+    cursor.execute(
+        "SELECT COUNT(*) FROM predictions WHERE user_email=? AND risk_level='Medium'",
+        (email,)
+    )
+    medium = cursor.fetchone()[0]
+
+    cursor.execute(
+        "SELECT COUNT(*) FROM predictions WHERE user_email=? AND risk_level='Low'",
+        (email,)
+    )
+    low = cursor.fetchone()[0]
+
+    cursor.execute("""
+
+    SELECT *
+
+    FROM predictions
+
+    WHERE user_email=?
+
+    AND risk_level='High'
+
+    ORDER BY id DESC
+
+    LIMIT 5
+
+    """, (email,))
+
+    high_rows = cursor.fetchall()
+
+    conn.close()
+
+    return render_template(
+    "reports.html",
+    user=session["user"],
+    total=total,
+    high=high,
+    medium=medium,
+    low=low,
+    high_rows=high_rows
+)
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -154,65 +253,54 @@ def predict():
     features = scaler.transform(features)
 
     probability = model.predict_proba(features)[0][1]
-    probability_percent = round(probability * 100,2)
+    probability_percent = round(probability * 100, 2)
 
     if probability >= 0.70:
 
         prediction = "Customer is likely to churn."
-
         risk = "High"
 
     elif probability >= 0.40:
 
         prediction = "Customer may churn."
-
         risk = "Medium"
 
     else:
 
         prediction = "Customer is not likely to churn."
-
         risk = "Low"
 
-        conn = sqlite3.connect("bank.db")
+    # Save prediction to database
+    conn = sqlite3.connect("bank.db")
 
-        cursor = conn.cursor()
+    cursor = conn.cursor()
 
-        cursor.execute("""
-
-        INSERT INTO predictions(
-
-        user_name,
-
-        user_email,
-
-        probability,
-
+    cursor.execute("""
+    INSERT INTO predictions(
+    user_name,
+    user_email,
+    probability,
+    prediction,
+    risk_level
+    )
+    VALUES(?,?,?,?,?)
+    """, (
+        session["user"]["name"],
+        session["user"]["email"],
+        probability_percent,
         prediction,
+        risk
+    ))
 
-        risk_level
-
-        )
-
-        VALUES(?,?,?,?,?)
-
-        """,(session["user"]["name"],
-            session["user"]["email"],
-            probability_percent,
-            prediction,
-            risk))
-
-        conn.commit()
-
-        conn.close()
+    conn.commit()
+    conn.close()
 
     return render_template(
-    "index.html",
-    user=session["user"],
-    prediction=prediction,
-    probability=round(probability * 100, 2)
-)
-
+        "index.html",
+        user=session["user"],
+        prediction=prediction,
+        probability=probability_percent
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)
