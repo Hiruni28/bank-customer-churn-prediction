@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Bank Customer Churn Prediction</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+    <div class="container">
+
+        <a class="navbar-brand fw-bold" href="/">
+            🏦 Bank Churn Prediction
+        </a>
+
+        <div class="ms-auto d-flex align-items-center">
+
+            <img src="{{ user.picture }}"
+                 class="rounded-circle me-3"
+                 width="45"
+                 height="45">
+
+            <span class="text-white me-3">
+                {{ user.name }}
+            </span>
+
+            <a href="/logout" class="btn btn-outline-light">
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+</nav>
+
+<div class="text-end mb-3">
+
+    <a href="/" class="btn btn-secondary">
+
+        ← Dashboard
+
+    </a>
+
+</div>
+
+<div class="container">
+
+    <div class="card shadow-lg p-4">
+
+        <h1 class="text-center mb-2">
+            Bank Customer Churn Prediction
+        </h1>
+
+        <p class="text-center text-muted mb-4">
+            Predict whether a customer is likely to leave the bank.
+        </p>
+
+        <form action="/predict" method="POST">
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label>Credit Score</label>
+                    <input type="number" class="form-control" name="credit_score" required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Age</label>
+                    <input type="number" class="form-control" name="age" required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Tenure</label>
+                    <input type="number" class="form-control" name="tenure" required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Balance</label>
+                    <input type="number" step="0.01" class="form-control" name="balance" required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Number of Products</label>
+                    <input type="number" class="form-control" name="num_products" required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Estimated Salary</label>
+                    <input type="number" step="0.01" class="form-control" name="salary" required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Has Credit Card?</label>
+
+                    <select class="form-select" name="has_card">
+
+                        <option value="1">Yes</option>
+
+                        <option value="0">No</option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label>Is Active Member?</label>
+
+                    <select class="form-select" name="active_member">
+
+                        <option value="1">Yes</option>
+
+                        <option value="0">No</option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label>Gender</label>
+
+                    <select class="form-select" name="gender">
+
+                        <option>Male</option>
+
+                        <option>Female</option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label>Country</label>
+
+                    <select class="form-select" name="geography">
+
+                        <option>France</option>
+
+                        <option>Germany</option>
+
+                        <option>Spain</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="text-center mt-3">
+
+                <button class="btn btn-primary btn-lg">
+                    Predict Churn
+                </button>
+
+            </div>
+
+        </form>
+
+        {% if prediction %}
+
+<div class="result mt-5">
+
+    {% if probability >= 70 %}
+
+        <h2 class="text-danger">
+            🔴 High Risk Customer
+        </h2>
+
+    {% elif probability >= 40 %}
+
+        <h2 class="text-warning">
+            🟡 Medium Risk Customer
+        </h2>
+
+    {% else %}
+
+        <h2 class="text-success">
+            🟢 Low Risk Customer
+        </h2>
+
+    {% endif %}
+
+    <h3 class="mt-3">
+        {{ prediction }}
+    </h3>
+
+    <h1 class="display-4 mt-3">
+        {{ probability }}%
+    </h1>
+
+    <div class="progress mt-4">
+
+        <div class="progress-bar bg-primary"
+             style="width: {{ probability }}%;">
+
+        </div>
+
+    </div>
+
+    <div class="mt-4">
+
+    <h4>Recommendation</h4>
+
+    {% if probability >= 70 %}
+
+        <ul>
+
+            <li>✔ Contact the customer immediately</li>
+
+            <li>✔ Offer personalized discounts</li>
+
+            <li>✔ Assign a relationship manager</li>
+
+        </ul>
+
+    {% elif probability >= 40 %}
+
+        <ul>
+
+            <li>✔ Monitor customer activity</li>
+
+            <li>✔ Offer loyalty rewards</li>
+
+        </ul>
+
+    {% else %}
+
+        <ul>
+
+            <li>✔ Maintain customer engagement</li>
+
+            <li>✔ Continue regular services</li>
+
+        </ul>
+
+    {% endif %}
+
+</div>
+
+</div>
+
+{% endif %}
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
