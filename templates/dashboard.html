@@ -51,53 +51,63 @@
 
         <div class="row mt-5">
 
-            <div class="col-md-3">
+        <div class="col-md-3">
 
-                <div class="info-card">
+        <div class="info-card">
 
-                    <h4>Model</h4>
+        <h5>Total Predictions</h5>
 
-                    <h2>LightGBM</h2>
+        <h1>{{ total }}</h1>
 
-                </div>
+        </div>
 
-            </div>
+        </div>
 
-            <div class="col-md-3">
+        <div class="col-md-3">
 
-                <div class="info-card">
+        <div class="info-card">
 
-                    <h4>Accuracy</h4>
+        <h5>High Risk</h5>
 
-                    <h2>97%</h2>
+        <h1 style="color:red;">{{ high }}</h1>
 
-                </div>
+        </div>
 
-            </div>
+        </div>
 
-            <div class="col-md-3">
+        <div class="col-md-3">
 
-                <div class="info-card">
+        <div class="info-card">
 
-                    <h4>Algorithm</h4>
+        <h5>Medium Risk</h5>
 
-                    <h2>Classification</h2>
+        <h1 style="color:orange;">{{ medium }}</h1>
 
-                </div>
+        </div>
 
-            </div>
+        </div>
 
-            <div class="col-md-3">
+        <div class="col-md-3">
 
-                <div class="info-card">
+        <div class="info-card">
 
-                    <h4>Status</h4>
+        <h5>Low Risk</h5>
 
-                    <h2>Active</h2>
+        <h1 style="color:green;">{{ low }}</h1>
 
-                </div>
+        </div>
 
-            </div>
+        </div>
+
+        </div>
+
+        <div class="row mt-5">
+
+        <div class="col-md-8 mx-auto">
+
+        <canvas id="riskChart"></canvas>
+
+        </div>
 
         </div>
 
@@ -115,11 +125,59 @@
 
             </a>
 
+            <a href="/reports" class="btn btn-info">
+                Reports
+            </a>
+
         </div>
 
     </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+
+    <script>
+
+    const ctx = document.getElementById("riskChart");
+
+    new Chart(ctx,{
+
+    type:"pie",
+
+    data:{
+
+    labels:["High","Medium","Low"],
+
+    datasets:[{
+
+    data:[
+
+    {{ high }},
+
+    {{ medium }},
+
+    {{ low }}
+
+    ],
+
+    backgroundColor:[
+
+    "#dc3545",
+
+    "#ffc107",
+
+    "#198754"
+
+    ]
+
+    }]
+
+    }
+
+    });
+
+    </script>
 
 </body>
 
