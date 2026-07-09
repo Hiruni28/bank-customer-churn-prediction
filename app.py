@@ -2,14 +2,17 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import numpy as np
 import joblib
 import os
+import sqlite3
 
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
+from database import init_db
 
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
+init_db()
 
 oauth = OAuth(app)
 
@@ -76,6 +79,38 @@ def prediction():
         user=session["user"]
     )
 
+@app.route("/history")
+def history():
+
+    if "user" not in session:
+        return redirect(url_for("home"))
+
+    conn = sqlite3.connect("bank.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+
+    SELECT *
+
+    FROM predictions
+
+    WHERE user_email=?
+
+    ORDER BY id DESC
+
+    """,(session["user"]["email"],))
+
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    return render_template(
+        "history.html",
+        user=session["user"],
+        rows=rows
+    )
+
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -119,11 +154,57 @@ def predict():
     features = scaler.transform(features)
 
     probability = model.predict_proba(features)[0][1]
+    probability_percent = round(probability * 100,2)
 
-    if probability >= 0.5:
+    if probability >= 0.70:
+
         prediction = "Customer is likely to churn."
+
+        risk = "High"
+
+    elif probability >= 0.40:
+
+        prediction = "Customer may churn."
+
+        risk = "Medium"
+
     else:
+
         prediction = "Customer is not likely to churn."
+
+        risk = "Low"
+
+        conn = sqlite3.connect("bank.db")
+
+        cursor = conn.cursor()
+
+        cursor.execute("""
+
+        INSERT INTO predictions(
+
+        user_name,
+
+        user_email,
+
+        probability,
+
+        prediction,
+
+        risk_level
+
+        )
+
+        VALUES(?,?,?,?,?)
+
+        """,(session["user"]["name"],
+            session["user"]["email"],
+            probability_percent,
+            prediction,
+            risk))
+
+        conn.commit()
+
+        conn.close()
 
     return render_template(
     "index.html",
