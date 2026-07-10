@@ -15,9 +15,12 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 </head>
 
 <body class="bg-light">
+    {% include 'navbar.html' %}
 
 <div class="container py-5">
 
@@ -190,6 +193,8 @@ Dashboard
 
 <tbody>
 
+{% if high_rows %}
+
 {% for row in high_rows %}
 
 <tr>
@@ -213,6 +218,20 @@ Dashboard
 </tr>
 
 {% endfor %}
+
+{% else %}
+
+<tr>
+
+<td colspan="4" class="text-center">
+
+No High Risk Customers Found
+
+</td>
+
+</tr>
+
+{% endif %}
 
 </tbody>
 
