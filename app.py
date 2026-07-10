@@ -7,11 +7,17 @@ import sqlite3
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
 from database import init_db
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Table,
+    TableStyle,
+    Paragraph,
+    Spacer
+)
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.enums import TA_CENTER, TA_LEFT
 
 from io import BytesIO
 from flask import send_file
@@ -135,85 +141,285 @@ def download_report():
 
     buffer = BytesIO()
 
-    doc = SimpleDocTemplate(buffer)
+    doc = SimpleDocTemplate(
+        buffer,
+        rightMargin=30,
+        leftMargin=30,
+        topMargin=30,
+        bottomMargin=30
+    )
 
     styles = getSampleStyleSheet()
 
-    title = styles["Heading1"]
-    title.alignment = TA_CENTER
+    # Light "ledger" palette — paper background, dark-navy ink text,
+    # darker gold accent for AA contrast on a light page
+    PAPER = "#f7f4ec"
+    PANEL = "#ffffff"
+    PANEL_MUT = "#efe9db"
+    INK = "#1c2333"
+    INK_MUT = "#6b7280"
+    GOLD = "#b8860b"
+    GOLD_LINE = "#d9c290"
+
+    title_style = ParagraphStyle(
+        "TitleStyle",
+        parent=styles["Heading1"],
+        alignment=TA_CENTER,
+        fontName="Times-Bold",
+        fontSize=22,
+        textColor=colors.HexColor(INK),
+        spaceAfter=6
+    )
+
+    subtitle_style = ParagraphStyle(
+        "SubtitleStyle",
+        parent=styles["BodyText"],
+        alignment=TA_CENTER,
+        fontName="Courier",
+        fontSize=9,
+        textColor=colors.HexColor(INK_MUT),
+        spaceAfter=20
+    )
+
+    heading_style = ParagraphStyle(
+        "Heading",
+        parent=styles["Heading2"],
+        fontName="Times-Bold",
+        textColor=colors.HexColor(GOLD),
+        spaceAfter=10
+    )
+
+    body_style = ParagraphStyle(
+        "Body",
+        parent=styles["BodyText"],
+        fontName="Helvetica",
+        fontSize=11,
+        leading=18,
+        textColor=colors.HexColor(INK)
+    )
+
+    footer_style = ParagraphStyle(
+        "Footer",
+        alignment=TA_CENTER,
+        fontName="Courier",
+        textColor=colors.HexColor(INK_MUT),
+        fontSize=9
+    )
 
     elements = []
 
-    elements.append(Paragraph("Bank Customer Churn Prediction Report", title))
-    elements.append(Paragraph("<br/>", styles["Normal"]))
+    # =====================
+    # Title
+    # =====================
+
+    elements.append(
+        Paragraph(
+            "BANK CUSTOMER CHURN PREDICTION REPORT",
+            title_style
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            "MACHINE LEARNING PREDICTION SUMMARY",
+            subtitle_style
+        )
+    )
+
+    elements.append(Spacer(1, 10))
+
+    # =====================
+    # Risk Colour
+    # =====================
+
+    if data["risk"] == "High":
+        risk_color = colors.HexColor("#c0392b")
+        risk_text_color = colors.white
+        risk_text = "HIGH RISK"
+
+    elif data["risk"] == "Medium":
+        risk_color = colors.HexColor("#b8860b")
+        risk_text_color = colors.white
+        risk_text = "MEDIUM RISK"
+
+    else:
+        risk_color = colors.HexColor("#1f8f82")
+        risk_text_color = colors.white
+        risk_text = "LOW RISK"
+
+    # =====================
+    # Table
+    # =====================
 
     table_data = [
 
-        ["Customer", session["user"]["name"]],
+        ["Customer Name", session["user"]["name"]],
 
-        ["Email", session["user"]["email"]],
+        ["Email Address", session["user"]["email"]],
 
-        ["Date", datetime.now().strftime("%d-%m-%Y %H:%M")],
+        ["Generated On", datetime.now().strftime("%d %B %Y  %I:%M %p")],
 
-        ["Probability", f'{data["probability"]}%'],
+        ["Churn Probability", f'{data["probability"]}%'],
 
-        ["Risk Level", data["risk"]],
+        ["Risk Level", risk_text],
 
         ["Prediction", data["prediction"]]
 
     ]
 
-    table = Table(table_data, colWidths=[2.5 * inch, 4 * inch])
+    table = Table(table_data, colWidths=[2.3*inch,4*inch])
 
     table.setStyle(TableStyle([
 
-        ("BACKGROUND", (0, 0), (-1, 0), colors.lightblue),
+        ("BACKGROUND",(0,0),(0,-1),colors.HexColor(PANEL_MUT)),
+        ("BACKGROUND",(1,0),(1,-1),colors.HexColor(PANEL)),
 
-        ("GRID", (0, 0), (-1, -1), 1, colors.grey),
+        ("TEXTCOLOR",(0,0),(0,-1),colors.HexColor(INK_MUT)),
+        ("TEXTCOLOR",(1,0),(1,-1),colors.HexColor(INK)),
 
-        ("BACKGROUND", (0, 0), (0, -1), colors.whitesmoke),
+        ("GRID",(0,0),(-1,-1),0.75,colors.HexColor(GOLD_LINE)),
 
-        ("TEXTCOLOR", (0, 0), (-1, -1), colors.black),
+        ("FONTNAME",(0,0),(0,-1),"Courier-Bold"),
+        ("FONTSIZE",(0,0),(0,-1),9),
+        ("FONTNAME",(1,0),(1,-1),"Helvetica"),
 
-        ("FONTNAME", (0, 0), (-1, -1), "Helvetica"),
+        ("BOTTOMPADDING",(0,0),(-1,-1),10),
+        ("TOPPADDING",(0,0),(-1,-1),10),
+        ("LEFTPADDING",(0,0),(-1,-1),12),
 
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 8)
+        ("BACKGROUND",(1,4),(1,4),risk_color),
+        ("TEXTCOLOR",(1,4),(1,4),risk_text_color),
+        ("FONTNAME",(1,4),(1,4),"Helvetica-Bold")
 
     ]))
 
     elements.append(table)
 
-    elements.append(Paragraph("<br/><br/>", styles["Normal"]))
+    elements.append(Spacer(1,20))
 
-    if data["risk"] == "High":
+    # =====================
+    # Interpretation
+    # =====================
 
-        recommendation = """
-        <b>Recommendations</b><br/>
-        • Contact the customer immediately.<br/>
-        • Offer special loyalty benefits.<br/>
-        • Assign a relationship manager.
-        """
+    elements.append(
+        Paragraph(
+            "Prediction Interpretation",
+            heading_style
+        )
+    )
 
-    elif data["risk"] == "Medium":
+    if data["risk"]=="High":
 
-        recommendation = """
-        <b>Recommendations</b><br/>
-        • Monitor customer activity.<br/>
-        • Offer promotional rewards.<br/>
-        • Increase customer engagement.
-        """
+        interpretation="""
+This customer has a high probability of leaving the bank.
+
+Immediate customer retention strategies are recommended.
+"""
+
+    elif data["risk"]=="Medium":
+
+        interpretation="""
+This customer has a moderate probability of churn.
+
+Customer engagement should be monitored carefully.
+"""
 
     else:
 
-        recommendation = """
-        <b>Recommendations</b><br/>
-        • Continue providing quality service.<br/>
-        • Maintain customer engagement.
-        """
+        interpretation="""
+This customer is expected to remain loyal.
 
-    elements.append(Paragraph(recommendation, styles["BodyText"]))
+Continue providing quality banking services.
+"""
 
-    doc.build(elements)
+    elements.append(
+        Paragraph(
+            interpretation,
+            body_style
+        )
+    )
+
+    elements.append(Spacer(1,20))
+
+    # =====================
+    # Recommendations
+    # =====================
+
+    elements.append(
+        Paragraph(
+            "Recommended Actions",
+            heading_style
+        )
+    )
+
+    if data["risk"]=="High":
+
+        recommendation="""
+✔ Contact the customer immediately.<br/>
+✔ Offer personalized discounts.<br/>
+✔ Assign a relationship manager.<br/>
+✔ Monitor account activity closely.
+"""
+
+    elif data["risk"]=="Medium":
+
+        recommendation="""
+✔ Monitor customer activity.<br/>
+✔ Offer promotional rewards.<br/>
+✔ Increase customer engagement.<br/>
+✔ Send loyalty campaigns.
+"""
+
+    else:
+
+        recommendation="""
+✔ Continue quality customer service.<br/>
+✔ Maintain customer engagement.<br/>
+✔ Offer regular loyalty benefits.
+"""
+
+    elements.append(
+        Paragraph(
+            recommendation,
+            body_style
+        )
+    )
+
+    elements.append(Spacer(1,30))
+
+    # =====================
+    # Footer
+    # =====================
+
+    footer = Paragraph(
+        "GENERATED BY<br/>"
+        "Bank Customer Churn Prediction System — 2026",
+        footer_style
+    )
+
+    elements.append(footer)
+
+    # =====================
+    # Dark page background + gold top bar (drawn behind the flowables)
+    # =====================
+
+    def draw_background(canvas, doc):
+        canvas.saveState()
+        page_width, page_height = doc.pagesize
+
+        canvas.setFillColor(colors.HexColor(PAPER))
+        canvas.rect(0, 0, page_width, page_height, stroke=0, fill=1)
+
+        canvas.setFillColor(colors.HexColor(GOLD))
+        canvas.rect(0, page_height - 4, page_width, 4, stroke=0, fill=1)
+
+        canvas.restoreState()
+
+    doc.build(
+        elements,
+        onFirstPage=draw_background,
+        onLaterPages=draw_background
+    )
 
     buffer.seek(0)
 
@@ -223,6 +429,7 @@ def download_report():
         download_name="Prediction_Report.pdf",
         mimetype="application/pdf"
     )
+
 
 @app.route("/history")
 def history():
