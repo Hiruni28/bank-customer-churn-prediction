@@ -2,27 +2,25 @@
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial, Helvetica, sans-serif;
+    font-family:"Segoe UI",Arial,sans-serif;
 }
 
 body{
     background:linear-gradient(135deg,#0f4c81,#1b6ca8,#4facfe);
     min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:40px;
 }
 
 .container{
-    max-width:950px;
+    max-width:1000px;
+    margin:40px auto;
 }
 
 .card{
     border:none;
     border-radius:20px;
-    background:#ffffff;
-    padding:30px;
+    background:white;
+    box-shadow:0 12px 30px rgba(0,0,0,.20);
+    padding:35px;
 }
 
 h1{
@@ -37,21 +35,23 @@ label{
 
 .form-control,
 .form-select{
-    border-radius:10px;
-    height:45px;
+    border-radius:12px;
+    height:48px;
 }
 
-.btn{
-    width:220px;
-    border-radius:30px;
-    font-size:18px;
-    font-weight:bold;
-    padding:10px;
+.form-control:focus,
+.form-select:focus{
+    border-color:#0f4c81;
+    box-shadow:0 0 10px rgba(15,76,129,.25);
 }
 
 .btn-primary{
     background:#0f4c81;
     border:none;
+    width:240px;
+    border-radius:30px;
+    font-size:18px;
+    font-weight:bold;
 }
 
 .btn-primary:hover{
@@ -59,69 +59,58 @@ label{
 }
 
 .result{
+    margin-top:35px;
+    padding:30px;
+    border-radius:18px;
+    background:#f8f9fa;
     text-align:center;
-    padding:20px;
-    border-radius:15px;
-    background:#eaf6ff;
-    border-left:6px solid #0f4c81;
-}
-
-.result h3{
-    color:#0f4c81;
-    margin-bottom:15px;
-}
-
-.result span{
-    color:#198754;
-    font-size:30px;
-    font-weight:bold;
-}
-
-@media(max-width:768px){
-
-    body{
-        padding:20px;
-    }
-
-    .card{
-        padding:20px;
-    }
-
 }
 
 .progress{
     height:28px;
     border-radius:20px;
+    overflow:hidden;
 }
 
 .progress-bar{
-    font-size:16px;
     font-weight:bold;
+    font-size:15px;
 }
 
-.result{
-    animation:fadeIn .8s ease;
+.result ul{
+    display:inline-block;
+    text-align:left;
+    margin-top:15px;
 }
 
-@keyframes fadeIn{
-
-    from{
-        opacity:0;
-        transform:translateY(20px);
-    }
-
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-
+.result li{
+    margin-bottom:10px;
 }
 
-.navbar-brand{
-    font-size:24px;
+.navbar{
+    box-shadow:0 5px 20px rgba(0,0,0,.2);
 }
 
 .display-4{
     font-weight:bold;
-    color:#0f4c81;
+}
+
+.btn-danger{
+    border-radius:30px;
+}
+
+@media(max-width:768px){
+
+.container{
+    margin:20px;
+}
+
+.card{
+    padding:20px;
+}
+
+.btn-primary{
+    width:100%;
+}
+
 }
