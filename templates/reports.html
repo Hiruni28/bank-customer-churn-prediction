@@ -22,6 +22,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
 
 <link rel="stylesheet" href="{{ url_for('static', filename='reports.css') }}">
 
+<link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+
 </head>
 
 <body>
@@ -30,7 +32,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
 <div class="container py-5">
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-
 <div>
 
 <h2 class="fw-bold">
@@ -44,7 +45,7 @@ Welcome {{ user.name }}
 
 </div>
 
-<a href="/" class="btn btn-dark">
+<a href="/dashboard" class="btn btn-dark">
 <i class="fa fa-arrow-left"></i>
 Dashboard
 </a>
@@ -66,9 +67,7 @@ Dashboard
 <h2>{{ total }}</h2>
 
 </div>
-
 </div>
-
 </div>
 
 <div class="col-md-3">
@@ -84,9 +83,7 @@ Dashboard
 <h2>{{ high }}</h2>
 
 </div>
-
 </div>
-
 </div>
 
 <div class="col-md-3">
@@ -102,11 +99,8 @@ Dashboard
 <h2>{{ medium }}</h2>
 
 </div>
-
 </div>
-
 </div>
-
 <div class="col-md-3">
 
 <div class="card shadow border-success text-center">
@@ -120,11 +114,8 @@ Dashboard
 <h2>{{ low }}</h2>
 
 </div>
-
 </div>
-
 </div>
-
 </div>
 
 <div class="row mt-5">
@@ -142,11 +133,8 @@ Dashboard
 <div class="card-body">
 
 <canvas id="pieChart"></canvas>
-
 </div>
-
 </div>
-
 </div>
 
 <div class="col-md-6">
@@ -164,11 +152,8 @@ Dashboard
 <canvas id="barChart"></canvas>
 
 </div>
-
 </div>
-
 </div>
-
 </div>
 
 <div class="card shadow mt-5">
@@ -178,13 +163,9 @@ Dashboard
 <h5>Recent High Risk Predictions</h5>
 
 </div>
-
 <div class="card-body">
-
 <table class="table table-hover">
-
 <thead>
-
 <tr>
 
 <th>ID</th>
@@ -193,9 +174,7 @@ Dashboard
 <th>Prediction</th>
 
 </tr>
-
 </thead>
-
 <tbody>
 
 {% if high_rows %}
@@ -203,11 +182,9 @@ Dashboard
 {% for row in high_rows %}
 
 <tr>
-
 <td>{{ row[0] }}</td>
 
 <td>{{ row[3] }}%</td>
-
 <td>
 
 <span class="badge bg-danger">
@@ -215,11 +192,8 @@ Dashboard
 {{ row[5] }}
 
 </span>
-
 </td>
-
 <td>{{ row[4] }}</td>
-
 </tr>
 
 {% endfor %}
@@ -227,27 +201,20 @@ Dashboard
 {% else %}
 
 <tr>
-
 <td colspan="4" class="text-center">
 
 No High Risk Customers Found
 
 </td>
-
 </tr>
 
 {% endif %}
 
 </tbody>
-
 </table>
-
 </div>
-
 </div>
-
 </div>
-
 <script>
 
 const inkLine = "rgba(212,167,58,.12)";
@@ -275,11 +242,8 @@ backgroundColor:["#e6555b","#d4a73a","#49c6b8"],
 borderColor:"#111826",
 
 borderWidth:2
-
 }]
-
 },
-
 options:{
 
 plugins:{
@@ -287,13 +251,9 @@ plugins:{
 legend:{
 
 labels:{ color: textMid }
-
 }
-
 }
-
 }
-
 });
 
 new Chart(document.getElementById("barChart"),{
@@ -313,9 +273,7 @@ data:[{{high}},{{medium}},{{low}}],
 backgroundColor:["#e6555b","#d4a73a","#49c6b8"],
 
 borderRadius:6
-
 }]
-
 },
 
 options:{
@@ -325,9 +283,7 @@ plugins:{
 legend:{
 
 labels:{ color: textMid }
-
 }
-
 },
 
 scales:{
@@ -339,7 +295,6 @@ ticks:{ color: textMid },
 grid:{ color: inkLine }
 
 },
-
 y:{
 
 ticks:{ color: textMid },
@@ -347,17 +302,10 @@ ticks:{ color: textMid },
 grid:{ color: inkLine },
 
 beginAtZero:true
-
 }
-
 }
-
 }
-
 });
-
 </script>
-
 </body>
-
 </html>
