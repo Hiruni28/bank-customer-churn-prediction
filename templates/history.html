@@ -7,13 +7,18 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 </head>
 
 <body class="bg-light">
+    {% include 'navbar.html' %}
 
 <div class="container mt-5">
 
 <h2 class="mb-4">
+
+<i class="bi bi-clock-history"></i>
 
 Prediction History
 
@@ -47,6 +52,8 @@ Dashboard
 
 <tbody>
 
+{% if rows %}
+
 {% for row in rows %}
 
 <tr>
@@ -55,9 +62,45 @@ Dashboard
 
 <td>{{ row[6] }}</td>
 
-<td>{{ row[3] }}%</td>
+<td>
 
-<td>{{ row[5] }}</td>
+<div class="progress">
+
+<div class="progress-bar"
+
+style="width:{{ row[3] }}%">
+
+{{ row[3] }}%
+
+</div>
+
+</div>
+
+</td>
+
+<td>
+
+{% if row[5]=="High" %}
+
+<span class="badge bg-danger">
+High
+</span>
+
+{% elif row[5]=="Medium" %}
+
+<span class="badge bg-warning text-dark">
+Medium
+</span>
+
+{% else %}
+
+<span class="badge bg-success">
+Low
+</span>
+
+{% endif %}
+
+</td>
 
 <td>{{ row[4] }}</td>
 
@@ -65,11 +108,19 @@ Dashboard
 
 {% endfor %}
 
-</tbody>
+{% else %}
 
-</table>
+<tr>
 
-</div>
+<td colspan="5" class="text-center">
+
+No predictions yet.
+
+</td>
+
+</tr>
+
+{% endif %}
 
 </body>
 
