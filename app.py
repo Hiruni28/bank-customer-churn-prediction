@@ -63,19 +63,37 @@ def authorize():
         "picture": user["picture"]
     }
 
-    return redirect(url_for("home"))
+    return redirect(url_for("dashboard"))
 
 
 @app.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("home"))
+    return redirect(url_for("index"))
 
 @app.route("/")
-def home():
+def index():
+
+    if "user" in session:
+        return redirect(url_for("dashboard"))
+
+    return render_template("home.html")
+
+
+@app.route("/signin")
+def signin():
+
+    if "user" in session:
+        return redirect(url_for("dashboard"))
+
+    return render_template("login.html")
+
+
+@app.route("/dashboard")
+def dashboard():
 
     if "user" not in session:
-        return render_template("login.html")
+        return redirect(url_for("signin"))
 
     conn = sqlite3.connect("bank.db")
     cursor = conn.cursor()
@@ -121,7 +139,7 @@ def home():
 def prediction():
 
     if "user" not in session:
-        return redirect(url_for("home"))
+        return redirect(url_for("signin"))
 
     return render_template(
         "index.html",
@@ -132,7 +150,7 @@ def prediction():
 def download_report():
 
     if "user" not in session:
-        return redirect(url_for("home"))
+        return redirect(url_for("signin"))
 
     if "last_prediction" not in session:
         return redirect(url_for("prediction"))
@@ -435,7 +453,7 @@ Continue providing quality banking services.
 def history():
 
     if "user" not in session:
-        return redirect(url_for("home"))
+        return redirect(url_for("signin"))
 
     conn = sqlite3.connect("bank.db")
 
@@ -467,7 +485,7 @@ def history():
 def reports():
 
     if "user" not in session:
-        return redirect(url_for("home"))
+        return redirect(url_for("signin"))
 
     conn = sqlite3.connect("bank.db")
     cursor = conn.cursor()
@@ -532,7 +550,7 @@ def reports():
 def predict():
 
     if "user" not in session:
-        return redirect(url_for("home"))
+        return redirect(url_for("signin"))
 
     # Get values from the form
     credit_score = float(request.form["credit_score"])
