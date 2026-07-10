@@ -7,6 +7,15 @@ import sqlite3
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
 from database import init_db
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch
+from reportlab.lib.enums import TA_CENTER
+
+from io import BytesIO
+from flask import send_file
+from datetime import datetime
 
 load_dotenv()
 
@@ -106,12 +115,113 @@ def home():
 def prediction():
 
     if "user" not in session:
-
         return redirect(url_for("home"))
 
     return render_template(
         "index.html",
         user=session["user"]
+    )
+
+@app.route("/download-report")
+def download_report():
+
+    if "user" not in session:
+        return redirect(url_for("home"))
+
+    if "last_prediction" not in session:
+        return redirect(url_for("prediction"))
+
+    data = session["last_prediction"]
+
+    buffer = BytesIO()
+
+    doc = SimpleDocTemplate(buffer)
+
+    styles = getSampleStyleSheet()
+
+    title = styles["Heading1"]
+    title.alignment = TA_CENTER
+
+    elements = []
+
+    elements.append(Paragraph("Bank Customer Churn Prediction Report", title))
+    elements.append(Paragraph("<br/>", styles["Normal"]))
+
+    table_data = [
+
+        ["Customer", session["user"]["name"]],
+
+        ["Email", session["user"]["email"]],
+
+        ["Date", datetime.now().strftime("%d-%m-%Y %H:%M")],
+
+        ["Probability", f'{data["probability"]}%'],
+
+        ["Risk Level", data["risk"]],
+
+        ["Prediction", data["prediction"]]
+
+    ]
+
+    table = Table(table_data, colWidths=[2.5 * inch, 4 * inch])
+
+    table.setStyle(TableStyle([
+
+        ("BACKGROUND", (0, 0), (-1, 0), colors.lightblue),
+
+        ("GRID", (0, 0), (-1, -1), 1, colors.grey),
+
+        ("BACKGROUND", (0, 0), (0, -1), colors.whitesmoke),
+
+        ("TEXTCOLOR", (0, 0), (-1, -1), colors.black),
+
+        ("FONTNAME", (0, 0), (-1, -1), "Helvetica"),
+
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 8)
+
+    ]))
+
+    elements.append(table)
+
+    elements.append(Paragraph("<br/><br/>", styles["Normal"]))
+
+    if data["risk"] == "High":
+
+        recommendation = """
+        <b>Recommendations</b><br/>
+        • Contact the customer immediately.<br/>
+        • Offer special loyalty benefits.<br/>
+        • Assign a relationship manager.
+        """
+
+    elif data["risk"] == "Medium":
+
+        recommendation = """
+        <b>Recommendations</b><br/>
+        • Monitor customer activity.<br/>
+        • Offer promotional rewards.<br/>
+        • Increase customer engagement.
+        """
+
+    else:
+
+        recommendation = """
+        <b>Recommendations</b><br/>
+        • Continue providing quality service.<br/>
+        • Maintain customer engagement.
+        """
+
+    elements.append(Paragraph(recommendation, styles["BodyText"]))
+
+    doc.build(elements)
+
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name="Prediction_Report.pdf",
+        mimetype="application/pdf"
     )
 
 @app.route("/history")
@@ -269,6 +379,13 @@ def predict():
 
         prediction = "Customer is not likely to churn."
         risk = "Low"
+
+# Save last prediction in session
+    session["last_prediction"] = {
+        "probability": probability_percent,
+        "prediction": prediction,
+        "risk": risk
+    }
 
     # Save prediction to database
     conn = sqlite3.connect("bank.db")
