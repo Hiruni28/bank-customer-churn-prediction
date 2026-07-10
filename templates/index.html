@@ -7,7 +7,8 @@
 
     <title>Bank Customer Churn Prediction</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -16,6 +17,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <!-- style.css must load LAST so it wins over Bootstrap's own color/background rules -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
@@ -26,7 +30,7 @@
     <div class="card shadow-lg border-0 rounded-4 p-5">
         <div class="text-center mb-5">
 
-        <i class="fa-solid fa-building-columns fa-3x text-primary mb-3"></i>
+        <i class="fa-solid fa-building-columns fa-3x hero-icon mb-3"></i>
 
         <h1 class="fw-bold">
             Bank Customer Churn Prediction
@@ -98,7 +102,6 @@
                     </select>
 
                 </div>
-
                 <div class="col-md-6 mb-3">
 
                     <label class="fw-semibold mb-2"> Gender </label>
@@ -177,7 +180,7 @@
     <h1 class="display-2 fw-bold mt-4 text-primary">
     {{ probability }}%
     </h1>
-    <div class="progress mt-4" style="height:30px;">
+    <div class="progress mt-4">
 
         <div class="progress-bar progress-bar-striped progress-bar-animated
 
@@ -197,7 +200,6 @@
 
         </div>
     </div>
-
     <div class="mt-4 p-3 rounded bg-light">
 
     <h4>
@@ -251,3 +253,4 @@ document.querySelector("form").classList.add("animate__animated","animate__fadeI
 </script>
 </body>
 </html>
+
