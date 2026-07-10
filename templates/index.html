@@ -18,8 +18,10 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
-    <!-- style.css must load LAST so it wins over Bootstrap's own color/background rules -->
+    <!-- style.css and navbar.css must load LAST so they win over Bootstrap's own color/background rules -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
 </head>
 
 <body>
@@ -253,4 +255,3 @@ document.querySelector("form").classList.add("animate__animated","animate__fadeI
 </script>
 </body>
 </html>
-
