@@ -14,6 +14,8 @@
 
 <link rel="stylesheet" href="{{ url_for('static', filename='history.css') }}">
 
+<link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+
 </head>
 
 <body>
@@ -29,7 +31,7 @@ Prediction History
 
 </h2>
 
-<a href="/" class="btn btn-primary mb-3">
+<a href="/dashboard" class="btn btn-primary mb-3">
 
 Dashboard
 
@@ -87,7 +89,7 @@ style="width:{{ row[3] }}%">
 
 {% if row[5]=="High" %}
 
-<span class="badge bg-danger text-dark">
+<span class="badge bg-danger">
 High
 </span>
 
@@ -99,7 +101,7 @@ Medium
 
 {% else %}
 
-<span class="badge bg-success text-dark">
+<span class="badge bg-success">
 Low
 </span>
 
