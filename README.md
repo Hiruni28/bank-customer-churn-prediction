@@ -44,7 +44,7 @@ The application also stores prediction history, generates reports, and allows us
 
 - LightGBM
 - Scikit-learn
-- NumPy
+- Pandas & NumPy
 - Joblib
 
 ### Backend
