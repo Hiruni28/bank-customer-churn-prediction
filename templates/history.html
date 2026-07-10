@@ -5,16 +5,21 @@
 
 <title>Prediction History</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+<link rel="stylesheet" href="{{ url_for('static', filename='history.css') }}">
+
 </head>
 
-<body class="bg-light">
+<body>
     {% include 'navbar.html' %}
 
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
 
 <h2 class="mb-4">
 
@@ -82,7 +87,7 @@ style="width:{{ row[3] }}%">
 
 {% if row[5]=="High" %}
 
-<span class="badge bg-danger">
+<span class="badge bg-danger text-dark">
 High
 </span>
 
@@ -94,7 +99,7 @@ Medium
 
 {% else %}
 
-<span class="badge bg-success">
+<span class="badge bg-success text-dark">
 Low
 </span>
 
@@ -121,6 +126,12 @@ No predictions yet.
 </tr>
 
 {% endif %}
+
+</tbody>
+
+</table>
+
+</div>
 
 </body>
 
