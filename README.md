@@ -80,7 +80,7 @@ The application also stores prediction history, generates reports, and allows us
 ---
 
 ## 📂 Project Structure
-
+```
 
 bank-customer-churn-prediction/
 │
