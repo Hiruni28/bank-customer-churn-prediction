@@ -112,7 +112,6 @@ bank-customer-churn-prediction/
 ├── .env
 └── venv/
 ```
-
 ---
 
 ## ⚙️ Installation
@@ -250,14 +249,6 @@ The dashboard displays:
 ## 🔒 Authentication
 
 Users securely sign in using Google OAuth authentication before accessing the system.
-
----
-
-## 👨‍💻 Developer
-
-**Hiruni Parindhya**
-
-BSc (Hons) Computing & Software Engineering
 
 ---
 
